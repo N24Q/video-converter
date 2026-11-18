@@ -77,6 +77,9 @@ export function useAppData(): AppData {
   }, [reloadCatalog]);
 
   const updateSettings = useCallback(async (patch: Partial<AppSettings>) => {
+    // Apply immediately so controls respond without waiting for the save;
+    // the main process's validated result then replaces it.
+    setSettings((prev) => (prev ? { ...prev, ...patch } : prev));
     setSettings(await api.setSettings(patch));
   }, []);
 
