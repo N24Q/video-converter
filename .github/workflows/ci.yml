@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Checks and tests (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install FFmpeg and a virtual display
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg xvfb
+          ffmpeg -hide_banner -version | head -1
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Format check
+        run: npm run format:check
+      - name: Type check
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test:unit
+      - name: Integration tests
+        run: npm run test:integration
+      - name: Build
+        run: npm run build
+      - name: End-to-end tests
+        run: |
+          # Ubuntu 24.04 restricts unprivileged user namespaces, which
+          # Chromium's sandbox needs.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          xvfb-run -a npx playwright test
+      - name: Package
+        run: npx electron-builder --linux deb --${{ matrix.arch == 'amd64' && 'x64' || 'arm64' }} --publish never
+      - uses: actions/upload-artifact@v7
+        with:
+          name: deb-${{ matrix.arch }}
+          path: release/*.deb
+          if-no-files-found: error
+          retention-days: 14
