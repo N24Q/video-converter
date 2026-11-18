@@ -16,10 +16,11 @@ await new Promise((resolve, reject) => {
 });
 
 const electronPath = require('electron');
-const app = spawn(electronPath, ['.'], {
-  stdio: 'inherit',
-  env: { ...process.env, VITE_DEV_SERVER_URL: url },
-});
+// VS Code's integrated terminal sets ELECTRON_RUN_AS_NODE, which would make
+// Electron run as plain Node.
+const env = { ...process.env, VITE_DEV_SERVER_URL: url };
+delete env.ELECTRON_RUN_AS_NODE;
+const app = spawn(electronPath, ['.'], { stdio: 'inherit', env });
 app.on('exit', async (code) => {
   await server.close();
   process.exit(code ?? 0);

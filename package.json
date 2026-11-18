@@ -20,7 +20,7 @@
     "build": "npm run build:renderer && npm run build:electron",
     "build:renderer": "vite build",
     "build:electron": "node scripts/build-electron.mjs",
-    "start": "electron .",
+    "start": "node scripts/start.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
