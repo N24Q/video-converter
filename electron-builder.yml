@@ -1,0 +1,55 @@
+appId: io.github.n24q.videoconverter
+productName: Video Converter
+executableName: video-converter
+copyright: Copyright © 2026 N24Q
+artifactName: VideoConverter-${version}-${arch}.${ext}
+
+directories:
+  output: release
+  buildResources: assets
+
+# The renderer and main process are fully bundled, so no node_modules are
+# needed at runtime.
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - assets/icon.png
+  - package.json
+  - '!**/*.map'
+
+asar: true
+electronLanguages: [en-US, en-GB]
+
+linux:
+  target:
+    - deb
+  category: AudioVideo
+  icon: assets/icon.png
+  synopsis: Video and audio converter with AVCHD camcorder support
+  description: Convert video and audio files with FFmpeg, including AVCHD camcorder folders.
+  maintainer: N24Q <nathanq2504@gmail.com>
+  vendor: N24Q
+  syncDesktopName: true
+  desktop:
+    entry:
+      Name: Video Converter
+      Comment: Convert video and audio files
+      Categories: AudioVideo;Video;AudioVideoEditing;
+      Keywords: video;audio;convert;ffmpeg;avchd;mts;
+
+deb:
+  # Electron's runtime libraries plus FFmpeg, so apt installs everything.
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
+    - libsecret-1-0
+    - libasound2 | libasound2t64
+    - libgbm1
+    - ffmpeg
+  priority: optional
