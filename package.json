@@ -1,0 +1,67 @@
+{
+  "name": "video-converter",
+  "productName": "Video Converter",
+  "version": "0.1.0",
+  "description": "Video and audio converter for ChromeOS (Crostini) and Linux, based on FFmpeg, with AVCHD camcorder support.",
+  "license": "MIT",
+  "author": {
+    "name": "N24Q",
+    "email": "nathanq2504@gmail.com"
+  },
+  "homepage": "https://github.com/N24Q/video-converter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/N24Q/video-converter.git"
+  },
+  "main": "dist-electron/main.js",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build:renderer && npm run build:electron",
+    "build:renderer": "vite build",
+    "build:electron": "node scripts/build-electron.mjs",
+    "start": "electron .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "npm run build && playwright test",
+    "package": "npm run build && electron-builder --linux deb",
+    "package:amd64": "npm run build && electron-builder --linux deb --x64",
+    "package:arm64": "npm run build && electron-builder --linux deb --arm64",
+    "postinstall": "install-electron"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "electron": "^45.3.4",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.73.0",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "electron-winstaller": false
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
