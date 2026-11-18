@@ -1,0 +1,13 @@
+Formats:
+ D.. = Demuxing supported
+ .E. = Muxing supported
+ ..d = Is a device
+ ---
+  Ed alsa            ALSA audio output
+  E  iamf            Raw Immersive Audio Model and Formats
+  E  matroska        Matroska
+  E  mov             QuickTime / MOV
+  E  mp4             MP4 (MPEG-4 Part 14)
+  E  mpegts          MPEG-TS (MPEG-2 Transport Stream)
+  E  null            raw null video
+  E  webm            WebM
