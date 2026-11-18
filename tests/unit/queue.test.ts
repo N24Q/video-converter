@@ -23,6 +23,7 @@ function job(out = `/out/${++n}.mp4`): Job {
     warnings: [],
     attempts: 0,
     hwEncoderUsed: false,
+    overwrite: false,
   };
 }
 

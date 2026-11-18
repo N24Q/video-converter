@@ -268,6 +268,7 @@ export interface Job {
   warnings: string[];
   attempts: number;
   hwEncoderUsed: boolean;
+  overwrite: boolean; // user confirmed replacing an existing file
 }
 
 export interface JobRequest {
