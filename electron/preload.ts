@@ -15,6 +15,7 @@ const api: VideoConverterApi = {
   getFfmpegStatus: () => ipcRenderer.invoke(IPC.getFfmpegStatus),
   refreshFfmpeg: () => ipcRenderer.invoke(IPC.refreshFfmpeg),
   getFormats: () => ipcRenderer.invoke(IPC.getFormats),
+  getEncoders: () => ipcRenderer.invoke(IPC.getEncoders),
   getPresets: () => ipcRenderer.invoke(IPC.getPresets),
   resolvePreset: (presetId, formatId, mediaId) =>
     ipcRenderer.invoke(IPC.resolvePreset, presetId, formatId, mediaId),

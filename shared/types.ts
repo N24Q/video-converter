@@ -116,6 +116,27 @@ export interface OutputFormat {
   kind: OutputKind;
   available: boolean;
   notes?: string;
+  videoCodecs: string[] | null; // null = any (or unknown)
+  audioCodecs: string[] | null;
+}
+
+export interface EncoderOption {
+  name: string;
+  label: string;
+  type: 'video' | 'audio' | 'subtitle';
+  codec: string;
+  hw: 'vaapi' | 'nvenc' | null;
+  lossless: boolean;
+  quality: {
+    kind: 'range' | 'enum';
+    min?: number;
+    max?: number;
+    default: number;
+    label: string;
+    choices?: { value: number; label: string }[];
+  } | null;
+  speed: { values: string[]; default: string; label: string } | null;
+  defaultBitrateKbps: number | null;
 }
 
 export type PresetId =

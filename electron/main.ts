@@ -20,6 +20,11 @@ const DEV_URL = process.env.VITE_DEV_SERVER_URL;
 const RENDERER_INDEX = path.join(__dirname, '..', 'dist', 'index.html');
 const RENDERER_URL = pathToFileURL(RENDERER_INDEX).toString();
 
+// Allows tests (and portable setups) to use a separate settings directory.
+if (process.env.VIDEO_CONVERTER_USER_DATA) {
+  app.setPath('userData', path.resolve(process.env.VIDEO_CONVERTER_USER_DATA));
+}
+
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 }
@@ -34,7 +39,14 @@ const history = new HistoryStore(
   () => settings.get().historyLimit,
 );
 const tempTracker = new TempTracker(path.join(userData, 'partial-outputs.json'));
-const library = new MediaLibrary(() => ffmpeg.ffprobePath);
+let markToolsReady: () => void = () => {};
+const toolsReady = new Promise<void>((resolve) => {
+  markToolsReady = resolve;
+});
+const library = new MediaLibrary(
+  () => ffmpeg.ffprobePath,
+  () => toolsReady,
+);
 const approvedDirs = new Set<string>();
 let vaapiDevices: string[] = [];
 
@@ -89,6 +101,7 @@ async function refreshFfmpeg() {
   const s = settings.get();
   vaapiDevices = await listVaapiDevices();
   const status = await ffmpeg.refresh({ ffmpegPath: s.ffmpegPath, ffprobePath: s.ffprobePath });
+  markToolsReady();
   if (status.ok) {
     logger.info(`ffmpeg ${status.capabilities?.ffmpeg.version} at ${status.ffmpegPath}`);
     library.reprobeFailed();

@@ -1,4 +1,10 @@
-import type { CodecEntry, FfmpegCapabilities, OutputFormat, OutputKind } from '../../shared/types';
+import type {
+  CodecEntry,
+  EncoderOption,
+  FfmpegCapabilities,
+  OutputFormat,
+  OutputKind,
+} from '../../shared/types';
 import { hasFormat } from './capabilities';
 
 // ---------------------------------------------------------------------------
@@ -1192,6 +1198,8 @@ export function getFormats(caps: FfmpegCapabilities | null): OutputFormat[] {
           ? 'No suitable video encoder in this FFmpeg build.'
           : 'No suitable audio encoder in this FFmpeg build.';
     }
+    const rule = CONTAINERS[f.muxer];
+    const list = (l: string[] | '*' | undefined) => (!l || l === '*' ? null : l);
     return {
       id: f.id,
       label: f.label,
@@ -1200,6 +1208,8 @@ export function getFormats(caps: FfmpegCapabilities | null): OutputFormat[] {
       kind: f.kind,
       available,
       notes,
+      videoCodecs: list(rule?.video),
+      audioCodecs: list(rule?.audio),
     };
   });
 }
@@ -1237,3 +1247,39 @@ export const BITMAP_SUBTITLE_CODECS = [
   'xsub',
   'dvb_teletext',
 ];
+
+/** Usable video/audio encoders with the controls the UI should offer. */
+export function getEncoderOptions(caps: FfmpegCapabilities | null): EncoderOption[] {
+  if (!caps) return [];
+  return caps.encoders
+    .filter((e) => (e.type === 'video' || e.type === 'audio') && isEncoderUsable(caps, e.name))
+    .map((e) => {
+      const info = ENCODERS[e.name];
+      return {
+        name: e.name,
+        label: info?.label ?? `${e.name} — ${e.description}`,
+        type: e.type as 'video' | 'audio',
+        codec: info?.codec ?? e.codec,
+        hw: info?.hw ?? null,
+        lossless: !!info?.lossless,
+        quality: info?.quality
+          ? {
+              kind: info.quality.kind,
+              min: info.quality.min,
+              max: info.quality.max,
+              default: info.quality.default,
+              label: info.quality.label,
+              choices: info.quality.choices?.map((c) => ({ value: c.value, label: c.label })),
+            }
+          : null,
+        speed: info?.speed
+          ? { values: info.speed.values, default: info.speed.default, label: info.speed.label }
+          : null,
+        defaultBitrateKbps: info?.defaultBitrateKbps ?? null,
+      };
+    })
+    .sort(
+      (a, b) =>
+        Number(!ENCODERS[a.name]) - Number(!ENCODERS[b.name]) || a.label.localeCompare(b.label),
+    );
+}

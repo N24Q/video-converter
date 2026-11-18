@@ -6,7 +6,7 @@ import path from 'node:path';
 import { IPC } from '../../shared/ipc';
 import type { AddJobsResult, AppSettings, Job, PresetId } from '../../shared/types';
 import { buildArgs } from '../services/args';
-import { getFormats, INPUT_EXTENSIONS } from '../services/catalog';
+import { getEncoderOptions, getFormats, INPUT_EXTENSIONS } from '../services/catalog';
 import { checkConcatCompatibility } from '../services/concat';
 import type { FfmpegService } from '../services/ffmpegService';
 import type { HistoryStore } from '../services/historyStore';
@@ -57,7 +57,7 @@ function handle(ctx: HandlerContext, channel: string, fn: Handler) {
     try {
       return await fn(ctx, ...args);
     } catch (err) {
-      if (err instanceof IpcValidationError) throw new Error(err.message);
+      if (err instanceof IpcValidationError) throw new Error(err.message, { cause: err });
       throw err;
     }
   });
@@ -229,6 +229,7 @@ export function registerHandlers(ctx: HandlerContext) {
     return c.ffmpeg.getStatus();
   });
   handle(ctx, IPC.getFormats, (c) => getFormats(c.ffmpeg.caps));
+  handle(ctx, IPC.getEncoders, (c) => getEncoderOptions(c.ffmpeg.caps));
   handle(ctx, IPC.getPresets, (c) => listPresets(c.ffmpeg.caps));
   handle(ctx, IPC.resolvePreset, (c, presetId, formatId) => {
     if (typeof presetId !== 'string' || typeof formatId !== 'string')

@@ -32,7 +32,15 @@ export class MediaLibrary extends EventEmitter {
   private probeQueue: string[] = [];
   private probing = 0;
 
-  constructor(private readonly ffprobe: () => string | null) {
+  /**
+   * @param ffprobe current FFprobe path (null if unavailable)
+   * @param toolsReady resolves once FFmpeg/FFprobe discovery has finished, so
+   *   files imported during startup aren't wrongly reported as uninspectable
+   */
+  constructor(
+    private readonly ffprobe: () => string | null,
+    private readonly toolsReady: () => Promise<void> = () => Promise.resolve(),
+  ) {
     super();
   }
 
@@ -154,6 +162,7 @@ export class MediaLibrary extends EventEmitter {
           }
           const item = await this.addFile(c.path, size, set.id, result);
           if (!item) continue;
+          result.media.push(item);
           set.clips.push({
             mediaId: item.id,
             name: c.fileName,
@@ -181,7 +190,7 @@ export class MediaLibrary extends EventEmitter {
     if (truncated)
       result.messages.push('Only the first 500 media files in the folder were imported.');
     for (const f of files) {
-      let size: number | null = null;
+      let size: number;
       try {
         size = (await fs.stat(f)).size;
       } catch {
@@ -250,6 +259,7 @@ export class MediaLibrary extends EventEmitter {
   }
 
   private async probeOne(item: MediaItem) {
+    await this.toolsReady();
     const ffprobe = this.ffprobe();
     if (!ffprobe) {
       item.status = 'error';

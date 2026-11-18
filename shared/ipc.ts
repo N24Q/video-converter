@@ -9,6 +9,7 @@ import type {
   ConcatCheck,
   ConversionSettings,
   Diagnostics,
+  EncoderOption,
   FfmpegStatus,
   HistoryEntry,
   ImportResult,
@@ -26,6 +27,7 @@ export const IPC = {
   getFfmpegStatus: 'ffmpeg:getStatus',
   refreshFfmpeg: 'ffmpeg:refresh',
   getFormats: 'catalog:getFormats',
+  getEncoders: 'catalog:getEncoders',
   getPresets: 'catalog:getPresets',
   resolvePreset: 'catalog:resolvePreset',
   openFiles: 'import:openFiles',
@@ -61,6 +63,7 @@ export interface VideoConverterApi {
   getFfmpegStatus(): Promise<FfmpegStatus>;
   refreshFfmpeg(): Promise<FfmpegStatus>;
   getFormats(): Promise<OutputFormat[]>;
+  getEncoders(): Promise<EncoderOption[]>;
   getPresets(): Promise<PresetDescriptor[]>;
   resolvePreset(
     presetId: PresetId,

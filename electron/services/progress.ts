@@ -55,7 +55,7 @@ export class ProgressParser {
 
   private snapshot(end: boolean): ProgressSnapshot {
     const c = this.current;
-    let outTimeSec: number | null = null;
+    let outTimeSec: number | null;
     const us = n(c.out_time_us) ?? n(c.out_time_ms); // out_time_ms is actually microseconds
     if (us !== null && us >= 0) outTimeSec = us / 1_000_000;
     else outTimeSec = parseOutTime(c.out_time);

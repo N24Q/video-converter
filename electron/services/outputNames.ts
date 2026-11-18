@@ -6,6 +6,7 @@ const MAX_STEM_BYTES = 180;
 export function sanitizeStem(stem: string): string {
   let s = stem
     .normalize('NFC')
+    // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001f\u007f]/g, '')
     .replace(/[/\\:*?"<>|]/g, '_')
     .replace(/^\.+/, '')
